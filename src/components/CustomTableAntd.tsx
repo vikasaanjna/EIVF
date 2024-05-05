@@ -8,6 +8,7 @@ interface TableProps {
   handleDragStart: any;
   render?: any;
   setFilterList: any;
+  uniqDataArray?: any;
 }
 export const CustomTableAntd: React.FC<TableProps> = ({
   dataSource,
@@ -15,24 +16,16 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   handleDragStart,
   render,
   setFilterList,
+  uniqDataArray,
 }) => {
-  const getUniqueValues = (data: any[], dataIndex: string) => {
-    const uniqueValues: any[] = [];
-    data.forEach((item) => {
-      const value = item[dataIndex];
-      if (!uniqueValues.includes(value)) {
-        uniqueValues.push(value);
-      }
-    });
-    uniqueValues.sort();
-    return uniqueValues.map((value) => ({ text: value, value }));
-  };
-
   const convertedColumns = columns.map((column) => {
     const { dataIndex } = column;
     return {
       ...column,
-      filters: getUniqueValues(dataSource, dataIndex),
+      filters: uniqDataArray[dataIndex]?.map((value: any) => ({
+        text: value[dataIndex],
+        value: value[dataIndex],
+      })),
       onFilter: (value: any, record: any) => record[dataIndex] === value,
     };
   });
@@ -49,8 +42,16 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     });
     setFilterList(newList);
   };
+
+  const getRowClassName = (record: any) =>
+    record["EventType"] === "Error" ? "error-row" : "";
+
   return (
-    <Table dataSource={dataSource} onChange={onTableChange}>
+    <Table
+      dataSource={dataSource}
+      onChange={onTableChange}
+      rowClassName={getRowClassName}
+    >
       {convertedColumns.map((item: any, index: number) => (
         <Column
           key={item.key}

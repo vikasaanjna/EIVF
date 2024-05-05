@@ -256,6 +256,7 @@ export const HomeScreen: React.FC<Props> = ({ tableData, setFilterList }) => {
         handleDragStart={handleDragStart}
         render={render}
         setFilterList={setFilterList}
+        uniqDataArray={uniqDataArray}
       />
     </div>
   );

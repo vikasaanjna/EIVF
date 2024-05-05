@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   FilterFilled,
   RetweetOutlined,
@@ -10,6 +10,7 @@ import { subDays, formatISO } from "date-fns";
 import instace from "../config/axios.instace";
 import { apiUrls } from "../constants/api.constants";
 import { Card } from "antd";
+import { AuthContext } from "../context";
 
 const defaultStartDate = subDays(new Date(), 1);
 const defaultEndDate = new Date();
@@ -20,6 +21,7 @@ export const Events: React.FC = () => {
   const [eventsData, setEventsData] = useState([]);
   const [tooltip, setTooltip] = useState(false);
   const [filterlist, setFilterList] = useState<any>();
+  const { loading, setLoading } = useContext<any>(AuthContext);
 
   const handleDateChange = (val: [Date, Date]) => {
     setStartDate(val[0]);
@@ -27,6 +29,7 @@ export const Events: React.FC = () => {
   };
 
   const getEvents = () => {
+    setLoading(true);
     const payload = {
       StartTime: formatISO(startDate),
       EndTime: formatISO(endDate),
@@ -35,8 +38,10 @@ export const Events: React.FC = () => {
       .post(apiUrls.getEvents, payload)
       .then((val) => {
         setEventsData(val.data);
+        setLoading(false);
       })
       .catch((e) => {
+        setLoading(false);
         console.error(e);
       });
   };
@@ -92,7 +97,9 @@ export const Events: React.FC = () => {
           />
         </>
       </PageHeader>
-      <HomeScreen tableData={eventsData} setFilterList={setFilterList} />
+      {!loading && (
+        <HomeScreen tableData={eventsData} setFilterList={setFilterList} />
+      )}
     </>
   );
 };
