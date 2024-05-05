@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const instace = axios.create({
+const instance = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   withCredentials: false,
   headers: {
@@ -10,4 +10,4 @@ const instace = axios.create({
   },
 });
 
-export default instace;
+export default instance;

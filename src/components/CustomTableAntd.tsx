@@ -45,7 +45,6 @@ export const CustomTableAntd: React.FC<TableProps> = ({
 
   const getRowClassName = (record: any) =>
     record["EventType"] === "Error" ? "error-row" : "";
-
   return (
     <Table
       dataSource={dataSource}
@@ -70,6 +69,9 @@ export const CustomTableAntd: React.FC<TableProps> = ({
           onFilter={item.onFilter}
           filterSearch={true}
           filterMode="tree"
+          defaultFilteredValue={item.filters?.map(
+            (filter: any) => filter.value
+          )}
         />
       ))}
     </Table>

@@ -6,11 +6,10 @@ import {
 } from "@ant-design/icons";
 import { IconButton, PageHeader, RangePicker } from "../components";
 import { HomeScreen } from "../screens";
-import { subDays, formatISO } from "date-fns";
-import instace from "../config/axios.instace";
-import { apiUrls } from "../constants/api.constants";
+import { subDays } from "date-fns";
 import { Card } from "antd";
 import { AuthContext } from "../context";
+import { getEvents } from "../service/apiService";
 
 const defaultStartDate = subDays(new Date(), 1);
 const defaultEndDate = new Date();
@@ -28,26 +27,21 @@ export const Events: React.FC = () => {
     setEndDate(val[1]);
   };
 
-  const getEvents = () => {
+  const handleGetEvents = async () => {
     setLoading(true);
-    const payload = {
-      StartTime: formatISO(startDate),
-      EndTime: formatISO(endDate),
-    };
-    instace
-      .post(apiUrls.getEvents, payload)
-      .then((val) => {
-        setEventsData(val.data);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setLoading(false);
-        console.error(e);
-      });
+    try {
+      const response = await getEvents(startDate, endDate);
+      setEventsData(response.data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    getEvents();
+    setLoading(true);
+    handleGetEvents();
   }, [endDate]);
 
   return (
@@ -93,7 +87,7 @@ export const Events: React.FC = () => {
           <IconButton
             tooltip="Refresh"
             icon={<RetweetOutlined />}
-            onClick={getEvents}
+            onClick={handleGetEvents}
           />
         </>
       </PageHeader>
