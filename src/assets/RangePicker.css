@@ -1,0 +1,11 @@
+.calendar-top-total-days {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+ 
+.ant-picker-panel-container {
+    position: relative;
+}

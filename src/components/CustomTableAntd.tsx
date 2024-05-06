@@ -1,6 +1,8 @@
 import Column from "antd/es/table/Column";
-import React from "react";
+import React, { useContext } from "react";
 import { Table } from "antd";
+import { RightOutlined } from "@ant-design/icons";
+import { AuthContext } from "../context";
 
 interface TableProps {
   dataSource: any[];
@@ -18,6 +20,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   setFilterList,
   uniqDataArray,
 }) => {
+  const { loading } = useContext<any>(AuthContext);
   const convertedColumns = columns.map((column) => {
     const { dataIndex } = column;
     return {
@@ -45,11 +48,35 @@ export const CustomTableAntd: React.FC<TableProps> = ({
 
   const getRowClassName = (record: any) =>
     record["EventType"] === "Error" ? "error-row" : "";
+
+  const expandIcon = ({ expanded, onExpand, record }: any) => (
+    <div
+      onClick={(e) => onExpand(record, e)}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        cursor: "pointer",
+      }}
+    >
+      <RightOutlined
+        style={{
+          marginRight: "5px",
+          transform: expanded ? "rotate(90deg)" : "rotate(0)",
+          transition: "transform 0.3s ease-in-out",
+        }}
+      />
+    </div>
+  );
+
   return (
     <Table
       dataSource={dataSource}
       onChange={onTableChange}
       rowClassName={getRowClassName}
+      expandable={{ expandIcon }}
+      scroll={{ y: 350, x: 2500 }}
+      loading={loading}
+      virtual
     >
       {convertedColumns.map((item: any, index: number) => (
         <Column
@@ -69,9 +96,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
           onFilter={item.onFilter}
           filterSearch={true}
           filterMode="tree"
-          defaultFilteredValue={item.filters?.map(
-            (filter: any) => filter.value
-          )}
+          // defaultFilteredValue={["Select all items "]}
         />
       ))}
     </Table>
