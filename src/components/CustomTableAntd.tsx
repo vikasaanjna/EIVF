@@ -33,6 +33,24 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     };
   });
 
+  const addKeyToObjects = (data: any, parentKey = "") => {
+    return data.map((item: any, index: any) => {
+      const key = `${parentKey}${index}`;
+      if (Array.isArray(item)) {
+        return addKeyToObjects(item, `${key}_`);
+      } else if (typeof item === "object" && item !== null) {
+        const newItem = { ...item, key };
+        if (item.children && Array.isArray(item.children)) {
+          newItem.children = addKeyToObjects(item.children, `${key}_child_`);
+        }
+        return newItem;
+      } else {
+        return item;
+      }
+    });
+  };
+
+  console.log(addKeyToObjects(dataSource));
   const onTableChange = (pagination: any, filters: any, sorter: any) => {
     const newList: any = [];
     columns.forEach((item) => {
@@ -49,9 +67,25 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   const getRowClassName = (record: any) =>
     record["EventType"] === "Error" ? "error-row" : "";
 
+  const applyPaddingToEmptyCells = () => {
+    const elements = document.querySelectorAll(
+      ".ant-table-cell.ant-table-expanded-row-cell"
+    );
+    elements.forEach((element) => {
+      if (!element.innerHTML.trim()) {
+        element.classList.add("empty-cell");
+      } else {
+        element.classList.remove("empty-cell");
+      }
+    });
+  };
+
   const expandIcon = ({ expanded, onExpand, record }: any) => (
     <div
-      onClick={(e) => onExpand(record, e)}
+      onClick={(e) => {
+        applyPaddingToEmptyCells();
+        onExpand(record, e);
+      }}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -59,6 +93,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
       }}
     >
       <RightOutlined
+        className={!record.children ? "expand-icon" : ""}
         style={{
           marginRight: "5px",
           transform: expanded ? "rotate(90deg)" : "rotate(0)",
@@ -68,12 +103,28 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     </div>
   );
 
+  const expandedRowRender = (record: any) => {
+    const elements = document.querySelectorAll(
+      ".ant-table-cell.ant-table-expanded-row-cell"
+    );
+    elements.forEach((element: any) => {
+      if (!element.innerHTML.trim()) {
+        element.style.padding = "0";
+      }
+    });
+    if (record.children && record.children.length > 0) {
+      return null;
+    } else {
+      return <span>{JSON.stringify(record, null, 2)}</span>;
+    }
+  };
+
   return (
     <Table
-      dataSource={dataSource}
+      dataSource={addKeyToObjects(dataSource)}
       onChange={onTableChange}
       rowClassName={getRowClassName}
-      expandable={{ expandIcon }}
+      expandable={{ expandIcon, expandedRowRender }}
       scroll={{ y: 350, x: 2500 }}
       loading={loading}
       virtual
@@ -96,7 +147,6 @@ export const CustomTableAntd: React.FC<TableProps> = ({
           onFilter={item.onFilter}
           filterSearch={true}
           filterMode="tree"
-          // defaultFilteredValue={["Select all items "]}
         />
       ))}
     </Table>
