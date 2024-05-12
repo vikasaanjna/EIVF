@@ -123,7 +123,11 @@ export const HomeScreen: React.FC<Props> = ({ tableData, setFilterList }) => {
     e.preventDefault();
     if (draggedItem) {
       setDraggedList([...draggedList, draggedItem]);
-      // setColumns(columns.filter((item) => item !== draggedItem));
+      const filteredCol = columns.filter(
+        (item) => item.title !== draggedItem.title
+      );
+      // setColumns(columns.filter((item) => item.title !== draggedItem.title));
+      setColumns([draggedItem, ...filteredCol]);
       setDraggedItem(null);
     }
   };
@@ -257,6 +261,7 @@ export const HomeScreen: React.FC<Props> = ({ tableData, setFilterList }) => {
         render={render}
         setFilterList={setFilterList}
         uniqDataArray={uniqDataArray}
+        draggedList={draggedList}
       />
     </div>
   );

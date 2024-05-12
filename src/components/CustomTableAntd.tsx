@@ -1,6 +1,6 @@
 import Column from "antd/es/table/Column";
-import React, { useContext } from "react";
-import { Table } from "antd";
+import React, { useContext, useState } from "react";
+import { Pagination, Table } from "antd";
 import { RightOutlined } from "@ant-design/icons";
 import { AuthContext } from "../context";
 
@@ -11,6 +11,7 @@ interface TableProps {
   render?: any;
   setFilterList: any;
   uniqDataArray?: any;
+  draggedList?: any;
 }
 export const CustomTableAntd: React.FC<TableProps> = ({
   dataSource,
@@ -19,6 +20,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   render,
   setFilterList,
   uniqDataArray,
+  draggedList,
 }) => {
   const { loading } = useContext<any>(AuthContext);
   const convertedColumns = columns.map((column) => {
@@ -33,6 +35,18 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     };
   });
 
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  const onPageChange = (page: number, pageSize?: number) => {
+    setCurrentPage(page);
+    pageSize && setPageSize(pageSize);
+  };
+
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = currentPage * pageSize;
+  const paginatedData = dataSource.slice(startIndex, endIndex);
+
   const addKeyToObjects = (data: any, parentKey = "") => {
     return data.map((item: any, index: any) => {
       const key = `${parentKey}${index}`;
@@ -40,7 +54,15 @@ export const CustomTableAntd: React.FC<TableProps> = ({
         return addKeyToObjects(item, `${key}_`);
       } else if (typeof item === "object" && item !== null) {
         const newItem = { ...item, key };
-        if (item.children && Array.isArray(item.children)) {
+        if (Array.isArray(item.children)) {
+          const dynamicKey = Object.keys(item).find(
+            (key) => !["key", "isExpandable", "children"].includes(key)
+          );
+          if (dynamicKey && !item[dynamicKey]?.includes(item.children.length)) {
+            item[
+              dynamicKey
+            ] = `${item[dynamicKey]} - ${item.children.length} items`;
+          }
           newItem.children = addKeyToObjects(item.children, `${key}_child_`);
         }
         return newItem;
@@ -50,7 +72,6 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     });
   };
 
-  console.log(addKeyToObjects(dataSource));
   const onTableChange = (pagination: any, filters: any, sorter: any) => {
     const newList: any = [];
     columns.forEach((item) => {
@@ -61,6 +82,8 @@ export const CustomTableAntd: React.FC<TableProps> = ({
         newList.push(data);
       }
     });
+    setPageSize(pagination.pageSize);
+    setCurrentPage(pagination.current);
     setFilterList(newList);
   };
 
@@ -71,6 +94,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
     const elements = document.querySelectorAll(
       ".ant-table-cell.ant-table-expanded-row-cell"
     );
+
     elements.forEach((element) => {
       if (!element.innerHTML.trim()) {
         element.classList.add("empty-cell");
@@ -118,37 +142,59 @@ export const CustomTableAntd: React.FC<TableProps> = ({
       return <span>{JSON.stringify(record, null, 2)}</span>;
     }
   };
+  const element2 = document.querySelectorAll(".ant-table-cell");
+  element2.forEach((ele: any) => {
+    if (draggedList?.length > 0) {
+      ele.style.overflow = "inherit";
+    }
+  });
 
   return (
-    <Table
-      dataSource={addKeyToObjects(dataSource)}
-      onChange={onTableChange}
-      rowClassName={getRowClassName}
-      expandable={{ expandIcon, expandedRowRender }}
-      scroll={{ y: 350, x: 2500 }}
-      loading={loading}
-      virtual
-    >
-      {convertedColumns.map((item: any, index: number) => (
-        <Column
-          key={item.key}
-          title={
-            <div
-              key={item.key + index}
-              draggable
-              onDragStart={(e) => handleDragStart(e, item)}
-            >
-              {item.title}
-            </div>
-          }
-          dataIndex={item.dataIndex}
-          render={render}
-          filters={item.filters}
-          onFilter={item.onFilter}
-          filterSearch={true}
-          filterMode="tree"
-        />
-      ))}
-    </Table>
+    <>
+      <Table
+        dataSource={addKeyToObjects(dataSource)}
+        onChange={onTableChange}
+        rowClassName={getRowClassName}
+        expandable={{ expandIcon, expandedRowRender }}
+        scroll={{ y: 350, x: 2500 }}
+        loading={loading}
+        virtual
+      >
+        {convertedColumns.map((item: any, index) => (
+          <Column
+            width={200}
+            key={item.key}
+            title={
+              <div
+                key={item.key + index}
+                draggable
+                onDragStart={(e) => handleDragStart(e, item)}
+              >
+                {item.title}
+              </div>
+            }
+            dataIndex={item.dataIndex}
+            render={render}
+            filters={item.filters}
+            onFilter={item.onFilter}
+            filterSearch={true}
+            filterMode="tree"
+          />
+        ))}
+      </Table>
+      {/* <Pagination
+        style={{ marginTop: "16px", textAlign: "right" }}
+        total={dataSource.length}
+        current={currentPage}
+        pageSize={pageSize}
+        showSizeChanger
+        showQuickJumper
+        onChange={onPageChange}
+        onShowSizeChange={(current, size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+      /> */}
+    </>
   );
 };
