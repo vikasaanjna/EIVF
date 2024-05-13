@@ -38,15 +38,6 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  const onPageChange = (page: number, pageSize?: number) => {
-    setCurrentPage(page);
-    pageSize && setPageSize(pageSize);
-  };
-
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = currentPage * pageSize;
-  const paginatedData = dataSource.slice(startIndex, endIndex);
-
   const addKeyToObjects = (data: any, parentKey = "") => {
     return data.map((item: any, index: any) => {
       const key = `${parentKey}${index}`;
@@ -152,14 +143,17 @@ export const CustomTableAntd: React.FC<TableProps> = ({
   return (
     <>
       <Table
-        dataSource={addKeyToObjects(paginatedData)}
+        dataSource={addKeyToObjects(dataSource)}
         onChange={onTableChange}
         rowClassName={getRowClassName}
         expandable={{ expandIcon, expandedRowRender }}
         scroll={{ y: 350, x: 2500 }}
         loading={loading}
         virtual
-        pagination={false}
+        pagination={{
+          showTotal: (total, range) =>
+            `${currentPage} of ${Math.ceil(total / pageSize)} (${total} items)`,
+        }}
       >
         {convertedColumns.map((item: any, index) => (
           <Column
@@ -183,23 +177,6 @@ export const CustomTableAntd: React.FC<TableProps> = ({
           />
         ))}
       </Table>
-      <Pagination
-        style={{ marginTop: "16px", textAlign: "right" }}
-        total={dataSource.length}
-        current={currentPage}
-        pageSize={pageSize}
-        showSizeChanger
-        showTotal={(total, range) =>
-          `${currentPage} of ${Math.ceil(
-            total / pageSize
-          )} Pages (${total} items)`
-        }
-        onChange={onPageChange}
-        onShowSizeChange={(current, size) => {
-          setPageSize(size);
-          setCurrentPage(1);
-        }}
-      />
     </>
   );
 };
