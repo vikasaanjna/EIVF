@@ -13,6 +13,8 @@ interface Column {
   filterSearch?: boolean;
   onFilter?: any;
   width?: string;
+  sorter?: any;
+  sortDirections?: any;
 }
 
 const columnsData: Column[] = [
@@ -20,61 +22,76 @@ const columnsData: Column[] = [
     key: 1,
     title: "EVENT NAME",
     dataIndex: "EventName",
+    sorter: (a: any, b: any) => a.EventName.localeCompare(b.EventName),
   },
   {
     key: 2,
     title: "EVENT TYPE",
     dataIndex: "EventType",
+    sorter: (a: any, b: any) => a.EventType.localeCompare(b.EventType),
   },
   {
     key: 3,
     title: "SUBSCRIBER NAME",
     dataIndex: "SubscriberName",
+    sorter: (a: any, b: any) =>
+      a.SubscriberName.localeCompare(b.SubscriberName),
   },
   {
     key: 4,
     title: "TENANT NAME",
     dataIndex: "TenantName",
+    sorter: (a: any, b: any) => a.TenantName.localeCompare(b.TenantName),
   },
   {
     key: 5,
     title: "MODULE",
     dataIndex: "Module",
+    sorter: (a: any, b: any) => a.Module.localeCompare(b.Module),
   },
   {
     key: 6,
     title: "CREATED ON(CST)",
     dataIndex: "CreatedOn",
+    sorter: (a: any, b: any) => a.CreatedOn.localeCompare(b.CreatedOn),
   },
   {
     key: 7,
     title: "MESSAGE",
     dataIndex: "Message",
+    sorter: (a: any, b: any) => a.Message.localeCompare(b.Message),
   },
   {
     key: 8,
     title: "REQUESTED ID",
     dataIndex: "AggregateId",
+    sorter: (a: any, b: any) => a.AggregateId.localeCompare(b.AggregateId),
   },
   {
     key: 9,
     title: "MODE",
     dataIndex: "Mode",
+    sorter: (a: any, b: any) => a.Mode.localeCompare(b.Mode),
   },
   {
     key: 10,
     title: "DELIVERY METHOD",
     dataIndex: "DeliveryMethod",
+    sorter: (a: any, b: any) =>
+      a.DeliveryMethod.localeCompare(b.DeliveryMethod),
   },
   {
     key: 11,
     title: "TRANSACTION TYPE",
     dataIndex: "TransactionType",
+    sorter: (a: any, b: any) =>
+      a.TransactionType.localeCompare(b.TransactionType),
   },
   {
     key: 12,
     title: "CODE",
     dataIndex: "Code",
+    sorter: (a: any, b: any) => a.Code.localeCompare(b.Code),
   },
 ];
 

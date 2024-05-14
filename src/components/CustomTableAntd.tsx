@@ -174,6 +174,7 @@ export const CustomTableAntd: React.FC<TableProps> = ({
             onFilter={item.onFilter}
             filterSearch={true}
             filterMode="tree"
+            sorter={item.sorter}
           />
         ))}
       </Table>
