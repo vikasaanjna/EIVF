@@ -7,14 +7,15 @@ import {
 import { IconButton, PageHeader, RangePicker } from "../components";
 import { HomeScreen } from "../screens";
 import { subDays } from "date-fns";
-import { Card } from "antd";
+import { Card, Dropdown, MenuProps, Space } from "antd";
 import { AuthContext } from "../context";
 import { getEvents } from "../service/apiService";
+import { ReactComponent as ExportIcon } from "../assets/export-icon.svg";
 
 const defaultStartDate = subDays(new Date(), 1);
 const defaultEndDate = new Date();
 
-export const Events: React.FC = () => {
+export const Events: any = () => {
   const [startDate, setStartDate] = useState(defaultStartDate);
   const [endDate, setEndDate] = useState(defaultEndDate);
   const [eventsData, setEventsData] = useState([]);
@@ -26,6 +27,61 @@ export const Events: React.FC = () => {
     setStartDate(val[0]);
     setEndDate(val[1]);
   };
+  const exportToCSV = () => {
+    if (eventsData.length === 0) {
+      return;
+    }
+
+    const csvRows = [];
+    const headers = Object.keys(eventsData[0]);
+    csvRows.push(headers.join(","));
+
+    for (const row of eventsData) {
+      const values = headers.map((header) => {
+        const escaped = String(row[header]).replace(/,/g, "\\,");
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(","));
+    }
+
+    const csvData = csvRows.join("\n");
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const filename = "data.csv";
+
+    if (link.download !== undefined) {
+      link.setAttribute("href", URL.createObjectURL(blob));
+      link.setAttribute("download", filename);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(URL.createObjectURL(blob));
+    }
+  };
+  const items: MenuProps["items"] = [
+    {
+      label: (
+        <>
+          <ExportIcon className="w-4 inline" />
+          <span className="pl-1" onClick={exportToCSV}>
+            All Records
+          </span>
+        </>
+      ),
+      key: "0",
+    },
+    {
+      label: (
+        <>
+          <ExportIcon className="w-4 inline" />
+          <span className="pl-1">Filtered Records</span>
+        </>
+      ),
+      key: "1",
+    },
+  ];
 
   const handleGetEvents = async () => {
     setLoading(true);
@@ -83,7 +139,14 @@ export const Events: React.FC = () => {
               </Card>
             )}
           </button>
-          <IconButton tooltip="Export" icon={<DownloadOutlined />} />
+          <Dropdown menu={{ items }} trigger={["click"]}>
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                <IconButton tooltip="Export" icon={<DownloadOutlined />} />
+              </Space>
+            </a>
+          </Dropdown>
+
           <IconButton
             tooltip="Refresh"
             icon={<RetweetOutlined />}
