@@ -142,42 +142,49 @@ export const CustomTableAntd: React.FC<TableProps> = ({
 
   return (
     <>
-      <Table
-        dataSource={addKeyToObjects(dataSource)}
-        onChange={onTableChange}
-        rowClassName={getRowClassName}
-        expandable={{ expandIcon, expandedRowRender }}
-        scroll={{ y: 350, x: 2500 }}
-        loading={loading}
-        virtual
-        pagination={{
-          showTotal: (total, range) =>
-            `${currentPage} of ${Math.ceil(total / pageSize)} (${total} items)`,
-        }}
-      >
-        {convertedColumns.map((item: any, index) => (
-          <Column
-            width={200}
-            key={item.key}
-            title={
-              <div
-                key={item.key + index}
-                draggable
-                onDragStart={(e) => handleDragStart(e, item)}
-              >
-                {item.title}
-              </div>
-            }
-            dataIndex={item.dataIndex}
-            render={render}
-            filters={item.filters}
-            onFilter={item.onFilter}
-            filterSearch={true}
-            filterMode="tree"
-            sorter={item.sorter}
-          />
-        ))}
-      </Table>
+      {convertedColumns && convertedColumns[0]?.filters?.length > 0 && (
+        <Table
+          dataSource={addKeyToObjects(dataSource)}
+          onChange={onTableChange}
+          rowClassName={getRowClassName}
+          expandable={{ expandIcon, expandedRowRender }}
+          scroll={{ y: 350, x: 2500 }}
+          loading={loading}
+          virtual
+          pagination={{
+            showTotal: (total, range) =>
+              `${currentPage} of ${Math.ceil(
+                total / pageSize
+              )} (${total} items)`,
+          }}
+        >
+          {convertedColumns.map((item: any, index) => (
+            <Column
+              width={200}
+              key={item.key}
+              title={
+                <div
+                  key={item.key + index}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, item)}
+                >
+                  {item.title}
+                </div>
+              }
+              dataIndex={item.dataIndex}
+              render={render}
+              filters={item.filters}
+              onFilter={item.onFilter}
+              defaultFilteredValue={
+                item.filters && item.filters.map((i: any) => i.value)
+              }
+              filterSearch={true}
+              filterMode="tree"
+              sorter={item.sorter}
+            />
+          ))}
+        </Table>
+      )}
     </>
   );
 };
