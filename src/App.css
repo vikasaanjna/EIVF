@@ -46,3 +46,48 @@
    font-size: 14px;
    text-align: left; 
 }
+
+.error-row {
+  color: red;
+}
+
+.ant-table-row > .ant-table-cell{
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: flex-start;
+}
+
+.empty-cell{
+  padding: 0;
+  transition: padding 0.3s ease;
+}
+.expand-icon {
+  margin-left: 15px;
+}
+
+/* .ant-table-row-expand-icon-cell {
+  max-width: 50px !important; 
+  
+} */
+.filtered-cell {
+  overflow: inherit !important;
+}
+
+.filtered-cell:hover {
+  overflow: inherit !important;
+}
+.ant-pagination{
+  position: relative;
+}
+.ant-pagination-options{
+  position: absolute;
+  left: 0;
+}
+.ant-pagination-total-text{
+position: absolute;
+left: 130px;
+}
+ul.ant-pagination li:nth-last-child(3) {
+ display: none;
+}
